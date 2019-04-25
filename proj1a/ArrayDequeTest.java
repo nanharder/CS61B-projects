@@ -34,16 +34,19 @@ public class ArrayDequeTest {
 
     public static void main(String[] args) {
         ArrayDeque<Integer> input = new ArrayDeque<>();
-        input.addFirst(0);
-        input.isEmpty();
+        input.addLast(0);
+        input.removeLast();
         input.addFirst(2);
-        input.isEmpty();
-        input.addFirst(4);
+        input.get(0);
+        input.removeFirst();
         input.addFirst(5);
         input.addFirst(6);
-        input.addFirst(7);
-        input.addFirst(8);
+        input.removeFirst();
+        input.get(0);
         input.removeLast();
+        input.addFirst(10);
+        input.removeLast();
+        input.addLast(12);
     }
 
 }
