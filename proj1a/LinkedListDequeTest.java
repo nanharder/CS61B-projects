@@ -3,7 +3,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LinkedListDequeTest {
-	
 	/* Utility method for printing out empty checks. */
 	public static boolean checkEmpty(boolean expected, boolean actual) {
 		if (expected != actual) {
@@ -38,7 +37,8 @@ public class LinkedListDequeTest {
 	  * && is the "and" operation. */
 	public static void addIsEmptySizeTest() {
 		System.out.println("Running add/isEmpty/Size test.");
-		System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
+		System.out.println("Make sure to uncomment the lines below " +
+				"(and delete this print statement).");
 
 		LinkedListDeque<String> lld1 = new LinkedListDeque<String>();
 
@@ -69,7 +69,8 @@ public class LinkedListDequeTest {
 
 		System.out.println("Running add/remove test.");
 
-		System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
+		System.out.println("Make sure to uncomment the lines " +
+				"below (and delete this print statement).");
 
 		LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
 		// should be empty 
@@ -103,15 +104,13 @@ public class LinkedListDequeTest {
 	@Test
 	public void TestRemoveLast() {
 		LinkedListDeque<Integer> input = new LinkedListDeque<>();
-		input.addFirst(1);
-		input.addFirst(2);
-		input.addLast(3);
+		input.addFirst(0);
+		input.removeLast();
+		input.addFirst(9);
 		int result = input.size();
-		assertEquals(3,result);
+		assertEquals(1, result);
 		int result2 = input.removeLast();
-		assertEquals(3, result2);
-		int result3 = input.get(1);
-		assertEquals(1,result3);
+		assertEquals(9, result2);
 	}
 
 	public static void main(String[] args) {

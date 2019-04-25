@@ -6,11 +6,13 @@ public class ArrayDequeTest {
     @Test
     public void TestAdd() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
-        input.addFirst(1);
-        input.addFirst(2);
-        int result = input.get(0);
-        int result2 = input.get(1);
-        assertEquals(2, result);
-        assertEquals(1, result2);
+        for (int i = 0; i < 100; i += 1) {
+            input.addLast(i);
+        }
+        int result = input.size();
+        int result2 = input.get(99);
+        assertEquals(100, result);
+        assertEquals(99, result2);
     }
+
 }

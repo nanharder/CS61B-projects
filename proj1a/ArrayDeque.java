@@ -7,7 +7,7 @@ public class ArrayDeque<T> {
     /** Create an empty ArrayDeque */
     public ArrayDeque() {
         items = (T []) new Object[8];
-        nextFirst = items.length - 1;
+        nextFirst = 0;
         nextLast = 0;
         size = 0;
     }
@@ -24,8 +24,9 @@ public class ArrayDeque<T> {
     /** Resize the Array */
     private void resize(int capacity) {
         T[] copy = (T []) new Object[capacity];
-        System.arraycopy(items, nextFirst + 1, copy, 0, items.length - nextFirst - 1);
-        System.arraycopy(items, 0, copy, size - nextFirst, nextLast);
+        int firstSize = items.length - nextFirst - 1;
+        System.arraycopy(items, nextFirst + 1, copy, 0, firstSize);
+        System.arraycopy(items, 0, copy, firstSize, nextLast);
         items = copy;
         nextLast = size;
         nextFirst = items.length - 1;
@@ -39,7 +40,12 @@ public class ArrayDeque<T> {
             resize(size * 2);
         }
         items[nextFirst] = item;
-        nextFirst -= 1;
+        if (nextFirst == 0) {
+            nextFirst = items.length -1;
+            nextLast += 1;
+        } else {
+            nextFirst -= 1;
+        }
         size += 1;
     }
 
@@ -51,6 +57,9 @@ public class ArrayDeque<T> {
             resize(size * 2);
         }
         items[nextLast] = item;
+        if (nextLast == 0) {
+            nextFirst = items.length -1;
+        }
         nextLast += 1;
         size += 1;
     }
@@ -134,9 +143,9 @@ public class ArrayDeque<T> {
     public T get(int index) {
         if (index >= size) {
             return null;
-        }else if (index < items.length - nextFirst - 1) {
+        } else if (index < items.length - nextFirst - 1) {
             return items[nextFirst + index + 1];
-        }else {
+        } else {
             return items[nextFirst + index + 1 - items.length];
         }
     }
