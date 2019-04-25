@@ -32,4 +32,15 @@ public class ArrayDequeTest {
         assertEquals(8, result2);
     }
 
+    public static void main(String[] args) {
+        ArrayDeque<Integer> input = new ArrayDeque<>();
+        input.addFirst(0);
+        input.addFirst(1);
+        input.addFirst(2);
+        input.removeLast();
+        input.addFirst(4);
+        input.addFirst(5);
+        input.addFirst(6);
+    }
+
 }

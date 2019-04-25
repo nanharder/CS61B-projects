@@ -33,12 +33,12 @@ public class ArrayDeque<T> {
     /** Resize the Array */
     private void resize(int capacity) {
         T[] copy = (T []) new Object[capacity];
-        if (nextFirst >= nextLast) {
+        if (nextLast - nextFirst <= 1) {
             int firstSize = items.length - nextFirst - 1;
             System.arraycopy(items, nextFirst + 1, copy, 0, firstSize);
             System.arraycopy(items, 0, copy, firstSize, size - firstSize);
         } else {
-            System.arraycopy(items,nextFirst + 1, copy, 0, size);
+            System.arraycopy(items, nextFirst + 1, copy, 0, size);
         }
         items = copy;
         nextLast = size;
