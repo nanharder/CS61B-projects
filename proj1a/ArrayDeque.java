@@ -59,7 +59,7 @@ public class ArrayDeque<T> {
             resize(size * 2);
         }
         items[nextFirst] = item;
-        if (size == 0) {
+        if (size == 0 && nextFirst == nextLast) {
             nextLast = checkChange(nextLast + 1);
         }
         nextFirst = checkChange(nextFirst - 1);
@@ -74,7 +74,7 @@ public class ArrayDeque<T> {
             resize(size * 2);
         }
         items[nextLast] = item;
-        if (size == 0) {
+        if (size == 0 && nextFirst == nextLast) {
             nextFirst = checkChange(nextFirst - 1);
         }
         nextLast = checkChange(nextLast + 1);

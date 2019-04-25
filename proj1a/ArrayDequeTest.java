@@ -32,6 +32,47 @@ public class ArrayDequeTest {
         assertEquals(8, result2);
     }
 
+    @Test
+    public void TestAdd2() {
+        ArrayDeque<Integer> input = new ArrayDeque<>();
+        input.isEmpty();
+        input.addFirst(1);
+        input.isEmpty();
+        input.removeLast();
+        input.isEmpty();
+        input.addFirst(5);
+        input.isEmpty();
+        int result = input.removeLast();
+        assertEquals(5, result);
+    }
+
+    @Test
+    public void Testadd3() {
+        ArrayDeque<Integer> input = new ArrayDeque<>();
+        input.addLast(0);
+        input.removeFirst();
+        input.isEmpty();
+        input.addLast(3);
+        input.removeFirst();
+    }
+
+    @Test
+    public void TestGet() {
+        ArrayDeque<Integer> input = new ArrayDeque<>();
+        input.addLast(0);
+        input.get(0);
+        input.removeLast();
+        input.addFirst(3);
+        input.removeFirst();
+        input.addFirst(5);
+        input.addLast(6);
+        input.removeLast();
+        input.addFirst(8);
+        input.addLast(9);
+        input.removeLast();
+        int result = input.removeLast();
+        assertEquals(5, result);
+    }
     public static void main(String[] args) {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.addLast(0);
