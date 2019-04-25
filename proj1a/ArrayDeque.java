@@ -7,13 +7,13 @@ public class ArrayDeque<T> {
     /** Create an empty ArrayDeque */
     public ArrayDeque() {
         items = (T []) new Object[8];
-        nextFirst = 0;
+        nextFirst = items.length - 1;
         nextLast = 0;
         size = 0;
     }
 
     /** Create an ArrayDeque */
-    public ArrayDeque(T item) {
+    private ArrayDeque(T item) {
         items = (T []) new Object[8];
         items[0] = item;
         nextFirst = items.length - 1;
@@ -21,12 +21,25 @@ public class ArrayDeque<T> {
         size = 1;
     }
 
+    private int checkChange(int num) {
+        if (num < 0) {
+            return num + items.length;
+        } else if (num >= items.length) {
+            return num - items.length;
+        } else {
+            return num;
+        }
+    }
     /** Resize the Array */
     private void resize(int capacity) {
         T[] copy = (T []) new Object[capacity];
-        int firstSize = items.length - nextFirst - 1;
-        System.arraycopy(items, nextFirst + 1, copy, 0, firstSize);
-        System.arraycopy(items, 0, copy, firstSize, nextLast);
+        if (nextFirst >= nextLast) {
+            int firstSize = items.length - nextFirst - 1;
+            System.arraycopy(items, nextFirst + 1, copy, 0, firstSize);
+            System.arraycopy(items, 0, copy, firstSize, size - firstSize);
+        } else {
+            System.arraycopy(items,nextFirst + 1, copy, 0, size);
+        }
         items = copy;
         nextLast = size;
         nextFirst = items.length - 1;
@@ -39,14 +52,14 @@ public class ArrayDeque<T> {
         if (size == items.length) {
             resize(size * 2);
         }
-        items[nextFirst] = item;
-        if (nextFirst == 0) {
-            nextFirst = items.length - 1;
-            nextLast += 1;
+
+        if (size == 0) {
+            addLast(item);
         } else {
-            nextFirst -= 1;
+            items[nextFirst] = item;
+            size += 1;
+            nextFirst = checkChange(nextFirst - 1);
         }
-        size += 1;
     }
 
     /**
@@ -57,10 +70,7 @@ public class ArrayDeque<T> {
             resize(size * 2);
         }
         items[nextLast] = item;
-        if (nextLast == 0) {
-            nextFirst = items.length - 1;
-        }
-        nextLast += 1;
+        nextLast = checkChange(nextLast + 1);
         size += 1;
     }
 
@@ -106,7 +116,7 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        nextFirst += 1;
+        nextFirst = checkChange(nextFirst + 1);
         T result = items[nextFirst];
         items[nextFirst] = null;
         size -= 1;
@@ -125,7 +135,7 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        nextLast -= 1;
+        nextLast = checkChange(nextLast - 1);
         T result = items[nextLast];
         items[nextLast] = null;
         size -= 1;
@@ -143,15 +153,16 @@ public class ArrayDeque<T> {
     public T get(int index) {
         if (index >= size) {
             return null;
-        } else if (index < items.length - nextFirst - 1) {
-            return items[nextFirst + index + 1];
+        }
+        if (nextFirst >= nextLast) {
+            return items[checkChange(index + nextFirst + 1)];
         } else {
-            return items[nextFirst + index + 1 - items.length];
+            return items[index - nextFirst];
         }
     }
 
     /** Creating a deep copy means that you create an entirely new ArrayDeque */
-    public ArrayDeque(ArrayDeque other) {
+    private ArrayDeque(ArrayDeque other) {
         items = (T []) new Object[other.items.length];
         System.arraycopy(other.items, 0, items, 0, other.size);
         nextFirst = other.nextFirst;

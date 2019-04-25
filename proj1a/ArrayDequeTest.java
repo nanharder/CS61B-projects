@@ -20,13 +20,16 @@ public class ArrayDequeTest {
         for (int i = 0; i < 16; i += 1) {
             input.addLast(i);
         }
-        for (int i = 0; i < 10; i += 1) {
+        for (int i = 0; i < 7; i += 1) {
             input.removeLast();
+        }
+        for (int i = 0; i < 7; i += 1) {
+            input.removeFirst();
         }
         int result = input.size();
         int result2 = input.get(0);
-        assertEquals(6, result);
-        assertEquals(0, result2);
+        assertEquals(2, result);
+        assertEquals(8, result2);
     }
 
 }
