@@ -34,18 +34,15 @@ public class ArrayDequeTest {
 
     public static void main(String[] args) {
         ArrayDeque<Integer> input = new ArrayDeque<>();
-        input.addFirst(0);
-        input.addFirst(1);
+        input.addLast(0);
         input.removeLast();
+        input.addLast(2);
         input.addFirst(3);
-        input.addFirst(4);
-        input.addFirst(5);
+        input.removeFirst();
+        input.isEmpty();
         input.addFirst(6);
-        input.addFirst(7);
-        input.removeLast();
-        for (int i = 0; i < 8; i += 1) {
-            System.out.println(input.get(i));
-        }
+        input.removeFirst();
+        input.removeFirst();
     }
 
 }

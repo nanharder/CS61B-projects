@@ -7,7 +7,7 @@ public class ArrayDeque<T> {
     /** Create an empty ArrayDeque */
     public ArrayDeque() {
         items = (T []) new Object[8];
-        nextFirst = items.length - 1;
+        nextFirst = 0;
         nextLast = 0;
         size = 0;
     }
@@ -33,16 +33,22 @@ public class ArrayDeque<T> {
     /** Resize the Array */
     private void resize(int capacity) {
         T[] copy = (T []) new Object[capacity];
-        if (nextLast - nextFirst <= 1) {
-            int firstSize = items.length - nextFirst - 1;
-            System.arraycopy(items, nextFirst + 1, copy, 0, firstSize);
-            System.arraycopy(items, 0, copy, firstSize, size - firstSize);
+        if (size == 0) {
+            items = copy;
+            nextLast = 0;
+            nextFirst = 0;
         } else {
-            System.arraycopy(items, nextFirst + 1, copy, 0, size);
+            if (nextLast - nextFirst <= 1) {
+                int firstSize = items.length - nextFirst - 1;
+                System.arraycopy(items, nextFirst + 1, copy, 0, firstSize);
+                System.arraycopy(items, 0, copy, firstSize, size - firstSize);
+            } else {
+                System.arraycopy(items, nextFirst + 1, copy, 0, size);
+            }
+            items = copy;
+            nextLast = size;
+            nextFirst = items.length - 1;
         }
-        items = copy;
-        nextLast = size;
-        nextFirst = items.length - 1;
     }
 
     /**
@@ -52,14 +58,9 @@ public class ArrayDeque<T> {
         if (size == items.length) {
             resize(size * 2);
         }
-
-        if (size == 0) {
-            addLast(item);
-        } else {
-            items[nextFirst] = item;
-            size += 1;
-            nextFirst = checkChange(nextFirst - 1);
-        }
+        items[nextFirst] = item;
+        nextFirst = checkChange(nextFirst - 1);
+        size += 1;
     }
 
     /**
