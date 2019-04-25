@@ -36,11 +36,16 @@ public class ArrayDequeTest {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.addFirst(0);
         input.addFirst(1);
-        input.addFirst(2);
         input.removeLast();
+        input.addFirst(3);
         input.addFirst(4);
         input.addFirst(5);
         input.addFirst(6);
+        input.addFirst(7);
+        input.removeLast();
+        for (int i = 0; i < 8; i += 1) {
+            System.out.println(input.get(i));
+        }
     }
 
 }
