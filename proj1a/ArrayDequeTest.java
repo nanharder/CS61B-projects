@@ -10,9 +10,9 @@ public class ArrayDequeTest {
             input.addLast(i);
         }
         int result = input.size();
-        int result2 = input.get(99);
+        int result2 = input.get(0);
         assertEquals(100, result);
-        assertEquals(99, result2);
+        assertEquals(0, result2);
     }
 
     public void TestRemove() {
@@ -34,15 +34,16 @@ public class ArrayDequeTest {
 
     public static void main(String[] args) {
         ArrayDeque<Integer> input = new ArrayDeque<>();
-        input.addLast(0);
-        input.removeLast();
-        input.addLast(2);
-        input.addFirst(3);
-        input.removeFirst();
+        input.addFirst(0);
         input.isEmpty();
+        input.addFirst(2);
+        input.isEmpty();
+        input.addFirst(4);
+        input.addFirst(5);
         input.addFirst(6);
-        input.removeFirst();
-        input.removeFirst();
+        input.addFirst(7);
+        input.addFirst(8);
+        input.removeLast();
     }
 
 }
