@@ -36,16 +36,15 @@ public class LinkedListDeque<T> {
     }
 
     /** Creates a deep copy of other */
-    public LinkedListDeque(LinkedListDeque other) {
-        sentinel = new ItemNode(null, null, null);
-        sentinel.next = sentinel;
-        sentinel.prev = sentinel;
+    private LinkedListDeque(LinkedListDeque other) {
+        LinkedListDeque copy = new LinkedListDeque();
         size = other.size;
         ItemNode curr = other.sentinel.next;
-        while (curr.item != null) {
-            sentinel.prev = new ItemNode(curr.item, sentinel.prev, sentinel);
+        while (!curr.equals(other.sentinel)) {
+            copy.addLast(curr.item);
             curr = curr.next;
         }
+        sentinel = copy.sentinel;
     }
     //不只要sentinel的两端，还有另一边也要修改
     /**
