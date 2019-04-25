@@ -1,11 +1,9 @@
 public class LinkedListDeque<T> {
-    /**
-     * first item is at sentinel.next
-     */
+    /** first item is at sentinel.next */
     private ItemNode sentinel;
     private int size;
 
-    public class ItemNode {
+    private class ItemNode {
         public ItemNode prev;
         public T item;
         public ItemNode next;
@@ -37,9 +35,7 @@ public class LinkedListDeque<T> {
         size = 1;
     }
 
-    /**
-     * Creates a deep copy of other
-     */
+    /** Creates a deep copy of other */
     public LinkedListDeque(LinkedListDeque other) {
         sentinel = new ItemNode(null, null, null);
         sentinel.next = sentinel;
@@ -51,12 +47,14 @@ public class LinkedListDeque<T> {
             curr = curr.next;
         }
     }
-
+    //不只要sentinel的两端，还有另一边也要修改
     /**
      * Adds an item of type T to the front of the deque
      */
     public void addFirst(T item) {
-        sentinel.next = new ItemNode(item, sentinel, sentinel.next);
+        ItemNode ToFront = new ItemNode(item, sentinel, sentinel.next);
+        sentinel.next.prev = ToFront;
+        sentinel.next = ToFront;
         size += 1;
     }
 
@@ -64,19 +62,15 @@ public class LinkedListDeque<T> {
      * Adds an item of type T to the back of the deque.
      */
     public void addLast(T item) {
-        sentinel.prev = new ItemNode(item, sentinel.prev, sentinel);
+        ItemNode ToEnd = new ItemNode(item, sentinel.prev, sentinel);
+        sentinel.prev.next = ToEnd;
+        sentinel.prev = ToEnd;
         size += 1;
     }
 
-    /**
-     * Returns true if deque is empty, false otherwise.
-     */
+    /** Returns true if deque is empty, false otherwise. */
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return (size == 0);
     }
 
     /**
@@ -91,8 +85,8 @@ public class LinkedListDeque<T> {
      * Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
-        ItemNode curr = sentinel;
-        while (curr.item != null) {
+        ItemNode curr = sentinel.next;
+        while (!curr.equals(sentinel)) {
             System.out.print(curr.item);
             System.out.print(" ");
             curr = curr.next;
@@ -105,6 +99,9 @@ public class LinkedListDeque<T> {
      * If no such item exists, returns null.
      */
     public T removeFirst() {
+        if (size == 0) {
+            return null;
+        }
         ItemNode first = sentinel.next;
         sentinel.next = sentinel.next.next;
         size -= 1;
@@ -116,6 +113,9 @@ public class LinkedListDeque<T> {
      * If no such item exists, returns null.
      */
     public T removeLast() {
+        if (size == 0) {
+            return null;
+        }
         ItemNode last = sentinel.prev;
         sentinel.prev = sentinel.prev.prev;
         size -= 1;

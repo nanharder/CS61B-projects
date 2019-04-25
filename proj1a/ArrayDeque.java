@@ -7,7 +7,7 @@ public class ArrayDeque<T> {
     /** Create an empty ArrayDeque */
     public ArrayDeque() {
         items = (T []) new Object[8];
-        nextFirst = 0;
+        nextFirst = items.length - 1;
         nextLast = 0;
         size = 0;
     }
@@ -59,11 +59,7 @@ public class ArrayDeque<T> {
      * Returns true if deque is empty, false otherwise.
      */
     public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return (size == 0);
     }
 
     /**
@@ -98,6 +94,9 @@ public class ArrayDeque<T> {
      * If no such item exists, returns null.
      */
     public T removeFirst() {
+        if (size == 0) {
+            return null;
+        }
         nextFirst += 1;
         T result = items[nextFirst];
         items[nextFirst] = null;
@@ -114,6 +113,9 @@ public class ArrayDeque<T> {
      * If no such item exists, returns null.
      */
     public T removeLast() {
+        if (size == 0) {
+            return null;
+        }
         nextLast -= 1;
         T result = items[nextLast];
         items[nextLast] = null;
@@ -137,7 +139,6 @@ public class ArrayDeque<T> {
         }else {
             return items[nextFirst + index + 1 - items.length];
         }
-
     }
 
     /** Creating a deep copy means that you create an entirely new ArrayDeque */

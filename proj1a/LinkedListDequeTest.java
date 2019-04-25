@@ -1,4 +1,7 @@
 /** Performs some basic linked list tests. */
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class LinkedListDequeTest {
 	
 	/* Utility method for printing out empty checks. */
@@ -84,9 +87,41 @@ public class LinkedListDequeTest {
 
 	}
 
+	@Test
+	public void TestRemoveFirst() {
+		LinkedListDeque<Integer> input = new LinkedListDeque<>();
+		input.addFirst(1);
+		input.addFirst(2);
+		int result = input.get(0);
+		assertEquals(2, result);
+		int result2 = input.removeFirst();
+		assertEquals(2, result2);
+		int result3 = input.get(0);
+		assertEquals(1, result3);
+	}
+
+	@Test
+	public void TestRemoveLast() {
+		LinkedListDeque<Integer> input = new LinkedListDeque<>();
+		input.addFirst(1);
+		input.addFirst(2);
+		input.addLast(3);
+		int result = input.size();
+		assertEquals(3,result);
+		int result2 = input.removeLast();
+		assertEquals(3, result2);
+		int result3 = input.get(1);
+		assertEquals(1,result3);
+	}
+
 	public static void main(String[] args) {
 		System.out.println("Running tests.\n");
-		addIsEmptySizeTest();
-		addRemoveTest();
+		//addIsEmptySizeTest();
+		//addRemoveTest();
+		LinkedListDeque<Integer> input = new LinkedListDeque<>();
+		input.addFirst(1);
+		input.addFirst(2);
+		input.addLast(3);
+		input.printDeque();
 	}
 } 
