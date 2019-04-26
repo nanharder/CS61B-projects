@@ -127,6 +127,11 @@ public class ArrayDeque<T> {
         T result = items[nextFirst];
         items[nextFirst] = null;
         size -= 1;
+
+        if (size == 0) {
+            nextLast = checkChange(nextLast - 1);
+        }
+
         if ((double) size / items.length < 0.25 && items.length >= 16) {
             resize(items.length / 2);
         }
@@ -146,6 +151,11 @@ public class ArrayDeque<T> {
         T result = items[nextLast];
         items[nextLast] = null;
         size -= 1;
+
+        if (size == 0) {
+            nextFirst = checkChange(nextFirst + 1);
+        }
+
         if ((double) size / items.length < 0.25 && items.length >= 16) {
             resize(items.length / 2);
         }

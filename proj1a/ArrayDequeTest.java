@@ -87,6 +87,19 @@ public class ArrayDequeTest {
     }
 
     @Test
+    public void TestGet3() {
+        ArrayDeque<Integer> input = new ArrayDeque<>();
+        input.addLast(0);
+        input.removeLast();
+        input.addFirst(2);
+        input.addFirst(3);
+        input.removeLast();
+        input.removeFirst();
+        input.addFirst(6);
+        input.get(0);
+    }
+
+    @Test
     public void TestResize() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         for (int i = 1; i < 64; i += 1) {
