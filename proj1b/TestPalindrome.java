@@ -17,5 +17,24 @@ public class TestPalindrome {
     }
 
     @Test
-    public void test
+    public void testIsPalindrome() {
+        String input1 = String.valueOf('c');
+        boolean result1 = palindrome.isPalindrome(input1);
+        assertTrue(result1);
+        String input2 = "abcba";
+        boolean result2 = palindrome.isPalindrome(input2);
+        assertTrue(result2);
+        String input3 = "abcde";
+        boolean result3 = palindrome.isPalindrome(input3);
+        assertFalse(result3);
+        assertFalse(palindrome.isPalindrome("cat"));
+
+    }
+
+    @Test
+    public void testIsPalindrome2() {
+        assertFalse(palindrome.isPalindrome("cac"));
+        assertTrue(palindrome.isPalindrome("cab"));
+        assertTrue(palindrome.isPalindrome("c"));
+    }
 }

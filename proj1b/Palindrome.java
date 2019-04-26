@@ -8,7 +8,36 @@ public class Palindrome {
         return wordDeque;
     }
 
+    private boolean isPalindromeHelper (Deque wordDeque) {
+        if (wordDeque.size() <=1 ) {
+            return true;
+        }
+        if (wordDeque.removeFirst().equals(wordDeque.removeLast())) {
+            return isPalindromeHelper(wordDeque);
+        } else {
+            return false;
+        }
+    }
+
+    /** Check if the word is Palindrome */
     public boolean isPalindrome(String word) {
-        return true;
+        Deque<Character> wordDeque = wordToDeque(word);
+        return isPalindromeHelper(wordDeque);
+    }
+
+    private boolean isPalindromeHelper (Deque wordDeque, CharacterComparator cc) {
+        if (wordDeque.size() <=1 ) {
+            return true;
+        }
+        if (cc.equalChars((char) wordDeque.removeFirst(), (char) wordDeque.removeLast())) {
+            return isPalindromeHelper(wordDeque);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isPalindrome(String word, CharacterComparator cc) {
+        Deque<Character> wordDeque = wordToDeque(word);
+        return isPalindromeHelper(wordDeque, cc);
     }
 }
