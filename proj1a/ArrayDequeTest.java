@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
     @Test
-    public void TestAdd() {
+    public void testAdd() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         for (int i = 0; i < 100; i += 1) {
             input.addLast(i);
@@ -15,7 +15,7 @@ public class ArrayDequeTest {
         assertEquals(0, result2);
     }
 
-    public void TestRemove() {
+    public void testRemove() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         for (int i = 0; i < 16; i += 1) {
             input.addLast(i);
@@ -33,7 +33,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void TestAdd2() {
+    public void testAdd2() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.isEmpty();
         input.addFirst(1);
@@ -47,7 +47,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void Testadd3() {
+    public void testadd3() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.addLast(0);
         input.removeFirst();
@@ -57,7 +57,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void TestGet() {
+    public void testGet() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.addLast(0);
         input.get(0);
@@ -75,7 +75,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void TestGet2() {
+    public void testGet2() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.addLast(0);
         input.addLast(1);
@@ -87,7 +87,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void TestGet3() {
+    public void testGet3() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         input.addFirst(0);
         input.addLast(1);
@@ -105,7 +105,7 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void TestResize() {
+    public void testResize() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
         for (int i = 1; i < 64; i += 1) {
             input.addFirst(1);

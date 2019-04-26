@@ -100,15 +100,9 @@ public class ArrayDeque<T> {
      * Once all the items have been printed, print out a new line.
      */
     public void printDeque() {
-        int i = nextFirst + 1;
+        int i = 0;
         while (i < size) {
-            System.out.print(items[i]);
-            System.out.print(" ");
-            i += 1;
-        }
-        i = 0;
-        while (i < nextLast) {
-            System.out.print(items[i]);
+            System.out.print(get(i));
             System.out.print(" ");
             i += 1;
         }
