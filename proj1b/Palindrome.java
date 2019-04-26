@@ -25,12 +25,12 @@ public class Palindrome {
         return isPalindromeHelper(wordDeque);
     }
 
-    private boolean isPalindromeHelper (Deque wordDeque, CharacterComparator cc) {
+    private boolean isPalindromeHelper(Deque wordDeque, CharacterComparator cc) {
         if (wordDeque.size() <= 1) {
             return true;
         }
         if (cc.equalChars((char) wordDeque.removeFirst(), (char) wordDeque.removeLast())) {
-            return isPalindromeHelper(wordDeque);
+            return isPalindromeHelper(wordDeque, cc);
         } else {
             return false;
         }

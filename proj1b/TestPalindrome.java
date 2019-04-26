@@ -35,10 +35,11 @@ public class TestPalindrome {
 
     @Test
     public void testIsPalindrome2() {
-        assertFalse(palindrome.isPalindrome("detrude", offByOne));
+        assertTrue(palindrome.isPalindrome("detrude", offByOne));
         assertTrue(palindrome.isPalindrome("", offByOne));
         assertTrue(palindrome.isPalindrome("abb", offByOne));
         assertTrue(palindrome.isPalindrome("c", offByOne));
+        assertFalse(palindrome.isPalindrome("abd", offByOne));
     }
 
     @Test
