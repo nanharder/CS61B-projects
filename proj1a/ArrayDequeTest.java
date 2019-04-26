@@ -89,14 +89,19 @@ public class ArrayDequeTest {
     @Test
     public void TestGet3() {
         ArrayDeque<Integer> input = new ArrayDeque<>();
-        input.addLast(0);
-        input.removeLast();
+        input.addFirst(0);
+        input.addLast(1);
         input.addFirst(2);
         input.addFirst(3);
+        input.removeFirst();
+        input.removeFirst();
+        input.addLast(6);
+        input.removeFirst();
+        input.addLast(8);
         input.removeLast();
         input.removeFirst();
-        input.addFirst(6);
-        input.get(0);
+        int result = input.get(0);
+        assertEquals(6, result);
     }
 
     @Test

@@ -171,11 +171,7 @@ public class ArrayDeque<T> {
         if (index >= size) {
             return null;
         }
-        if (nextLast - nextFirst <= 1) {
-            return items[checkChange(index + nextFirst + 1)];
-        } else {
-            return items[index - nextFirst + 1];
-        }
+        return items[checkChange(index + nextFirst + 1)];
     }
 
     /** Creating a deep copy means that you create an entirely new ArrayDeque */
