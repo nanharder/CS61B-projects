@@ -12,7 +12,7 @@ public interface Deque<T> {
     public void addLast(T item);
 
     /** Returns true if deque is empty, false otherwise. */
-    default public boolean isEmpty() {
+    public default boolean isEmpty() {
         return (size() == 0);
     }
 

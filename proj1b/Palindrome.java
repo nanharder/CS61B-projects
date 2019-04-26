@@ -9,7 +9,7 @@ public class Palindrome {
     }
 
     private boolean isPalindromeHelper (Deque wordDeque) {
-        if (wordDeque.size() <=1 ) {
+        if (wordDeque.size() <= 1) {
             return true;
         }
         if (wordDeque.removeFirst().equals(wordDeque.removeLast())) {
@@ -26,7 +26,7 @@ public class Palindrome {
     }
 
     private boolean isPalindromeHelper (Deque wordDeque, CharacterComparator cc) {
-        if (wordDeque.size() <=1 ) {
+        if (wordDeque.size() <= 1) {
             return true;
         }
         if (cc.equalChars((char) wordDeque.removeFirst(), (char) wordDeque.removeLast())) {
