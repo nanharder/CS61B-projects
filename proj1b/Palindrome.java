@@ -8,7 +8,7 @@ public class Palindrome {
         return wordDeque;
     }
 
-    private boolean isPalindromeHelper (Deque wordDeque) {
+    private boolean isPalindromeHelper(Deque wordDeque) {
         if (wordDeque.size() <= 1) {
             return true;
         }
