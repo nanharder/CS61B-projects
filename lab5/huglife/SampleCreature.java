@@ -29,7 +29,7 @@ public class SampleCreature extends Creature {
     /**
      * green color.
      */
-    private int g = 61;
+    private int g = 155;
     /**
      * blue color.
      */
