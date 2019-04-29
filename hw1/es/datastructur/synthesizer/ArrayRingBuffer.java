@@ -1,11 +1,7 @@
 package es.datastructur.synthesizer;
 import java.util.Iterator;
 
-//TODO: Make sure to that this class and all of its methods are public
-//TODO: Make sure to add the override tag for all overridden methods
-//TODO: Make sure to make this class implement BoundedQueue<T>
-
-public class ArrayRingBuffer<T>  {
+public class ArrayRingBuffer<T> implements BoundedQueue<T> {
     /* Index for the next dequeue or peek. */
     private int first;
     /* Index for the next enqueue. */
@@ -19,41 +15,118 @@ public class ArrayRingBuffer<T>  {
      * Create a new ArrayRingBuffer with the given capacity.
      */
     public ArrayRingBuffer(int capacity) {
-        // TODO: Create new array with capacity elements.
-        //       first, last, and fillCount should all be set to 0.
+        rb = (T []) new Object[capacity];
+        fillCount = 0;
+        first = 0;
+        last = 0;
+
+    }
+
+    private int checkNum(int n) {
+        if (n > capacity() - 1) {
+            return n - capacity();
+        } else {
+            return n;
+        }
+    }
+    /**
+     * return the fillcount of queue
+     */
+    @Override
+    public int fillCount() {
+        return fillCount;
+    }
+
+    /**
+     * return the capacitu of queue
+     */
+    @Override
+    public int capacity() {
+        return rb.length;
     }
 
     /**
      * Adds x to the end of the ring buffer. If there is no room, then
      * throw new RuntimeException("Ring buffer overflow").
      */
+    @Override
     public void enqueue(T x) {
-        // TODO: Enqueue the item. Don't forget to increase fillCount and update
-        //       last.
-        return;
+        if (isFull()) {
+            throw new RuntimeException("Ring Buffer overflow");
+        }
+        rb[last] = x;
+        last = checkNum(last + 1);
+        fillCount += 1;
     }
 
     /**
      * Dequeue oldest item in the ring buffer. If the buffer is empty, then
      * throw new RuntimeException("Ring buffer underflow").
      */
+    @Override
     public T dequeue() {
-        // TODO: Dequeue the first item. Don't forget to decrease fillCount and
-        //       update first.
-        return null;
+        if (isEmpty()) {
+            throw  new RuntimeException("Ring Buffer underflow");
+        }
+        T de = rb[first];
+        rb[first] = null;
+        first = checkNum(first + 1);
+        fillCount -= 1;
+        return de;
     }
 
     /**
      * Return oldest item, but don't remove it. If the buffer is empty, then
      * throw new RuntimeException("Ring buffer underflow").
      */
+    @Override
     public T peek() {
-        // TODO: Return the first item. None of your instance variables should
-        //       change.
-        return null;
+        return rb[first];
     }
 
-    // TODO: When you get to part 4, implement the needed code to support
-    //       iteration and equals.
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != this.getClass()) {
+            return false;
+        }
+        ArrayRingBuffer<T> other = (ArrayRingBuffer<T>) o;
+        if (other.capacity() != this.capacity()) {
+            return false;
+        }
+        Iterator<T> otherIterator = other.iterator();
+        for (T item : this) {
+            if (item != otherIterator.next()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayRingBufferIterator();
+    }
+
+    private class ArrayRingBufferIterator implements Iterator<T> {
+        private int wizpos;
+        ArrayRingBufferIterator() {
+            wizpos = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return (checkNum(wizpos + first) < last);
+        }
+
+        @Override
+        public T next() {
+            return rb[checkNum(wizpos + first)];
+        }
+    }
 }
-    // TODO: Remove all comments that say TODO when you're done.
+
