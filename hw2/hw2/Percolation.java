@@ -6,6 +6,7 @@ public class Percolation {
     private int size;
     private int numberofopensites;
     private WeightedQuickUnionUF gridindex;
+    private WeightedQuickUnionUF gridindexWithoutBottom;
     private int topindex;
     private int bottomindex;
     private boolean[] grid;
@@ -18,14 +19,13 @@ public class Percolation {
             size = N;
             numberofopensites = 0;
             gridindex = new WeightedQuickUnionUF(size * size + 2);
+            gridindexWithoutBottom = new WeightedQuickUnionUF(size * size + 1);
             topindex = size * size;
             bottomindex = size * size + 1;
             grid = new boolean[size * size];
-            for (boolean site: grid) {
-                site = false;
-            }
             for (int i = 0; i < size; i += 1) {
                 gridindex.union(i, topindex);
+                gridindexWithoutBottom.union(i, topindex);
                 gridindex.union(size * size - i - 1, bottomindex);
             }
         }
@@ -40,15 +40,16 @@ public class Percolation {
         if (checkPosition(x, y)) {
             return x * size + y;
         } else {
-            throw new java.lang.IndexOutOfBoundsException("argument is outside its prescribed range");
+            throw new java.lang.IndexOutOfBoundsException();
         }
     }
 
-    private void connectToOpenNeighbor(int cur,int row, int col) {
+    private void connectToOpenNeighbor(int cur, int row, int col) {
         if (checkPosition(row, col)) {
             if (isOpen(row, col)) {
                 int neighbor = xyToindex(row, col);
                 gridindex.union(cur, neighbor);
+                gridindexWithoutBottom.union(cur, neighbor);
             }
         }
     }
@@ -75,7 +76,7 @@ public class Percolation {
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         int index = xyToindex(row, col);
-        return isOpen(row, col) & gridindex.connected(topindex, index);
+        return isOpen(row, col) & gridindexWithoutBottom.connected(topindex, index);
     }
 
     // number of open sites

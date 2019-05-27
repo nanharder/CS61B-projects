@@ -16,7 +16,7 @@ public class PercolationStats {
         }
 
         double[] numberOfOpenSites = new double[T];
-        for (int i = 1; i <= T; i += 1) {
+        for (int i = 0; i < T; i += 1) {
             Percolation test = pf.make(N);
             while (!test.percolates()) {
                 openRandomSite(N, test);
@@ -30,7 +30,7 @@ public class PercolationStats {
     }
 
     private static void openRandomSite(int size, Percolation p) {
-        int row,col;
+        int row, col;
         do {
             row = StdRandom.uniform(size);
             col = StdRandom.uniform(size);
