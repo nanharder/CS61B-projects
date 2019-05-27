@@ -21,7 +21,7 @@ public class PercolationStats {
             while (!test.percolates()) {
                 openRandomSite(N, test);
             }
-            numberOfOpenSites[i] = (double)test.numberOfOpenSites() / (N * N);
+            numberOfOpenSites[i] = (double) test.numberOfOpenSites() / (N * N);
         }
         mean = StdStats.mean(numberOfOpenSites);
         stddev = StdStats.stddev(numberOfOpenSites);
@@ -58,10 +58,4 @@ public class PercolationStats {
         return confidenceHigh;
     }
 
-    public static void main(String[] args) {
-        PercolationFactory pf = new PercolationFactory();
-        PercolationStats ps = new PercolationStats(10, 20, pf);
-        System.out.println(ps.mean());
-        System.out.println(ps.stddev());
-    }
 }
