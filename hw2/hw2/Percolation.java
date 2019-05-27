@@ -23,11 +23,6 @@ public class Percolation {
             topindex = size * size;
             bottomindex = size * size + 1;
             grid = new boolean[size * size];
-            for (int i = 0; i < size; i += 1) {
-                gridindex.union(i, topindex);
-                gridindexWithoutBottom.union(i, topindex);
-                gridindex.union(size * size - i - 1, bottomindex);
-            }
         }
     }
 
@@ -64,6 +59,15 @@ public class Percolation {
             connectToOpenNeighbor(index, row + 1, col);
             connectToOpenNeighbor(index, row, col - 1);
             connectToOpenNeighbor(index, row, col + 1);
+        }
+
+        if (row == 0) {
+            gridindex.union(index, topindex);
+            gridindexWithoutBottom.union(index, topindex);
+        }
+
+        if (row == size - 1) {
+            gridindex.union(index, bottomindex);
         }
     }
 
