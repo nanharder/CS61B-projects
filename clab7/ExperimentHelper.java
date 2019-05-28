@@ -3,6 +3,15 @@
  */
 public class ExperimentHelper {
 
+    private static int optimalIPLhelper(int N, int step, int num, int sum) {
+        if (N == 0) {
+            return sum;
+        } else if (N >= num) {
+            return optimalIPLhelper(N - num, step + 1, num * 2, sum + N);
+        } else {
+            return sum + N;
+        }
+    }
     /** Returns the internal path length for an optimum binary search tree of
      *  size N. Examples:
      *  N = 1, OIPL: 0
@@ -15,7 +24,7 @@ public class ExperimentHelper {
      *  N = 8, OIPL: 13
      */
     public static int optimalIPL(int N) {
-        return 0;
+        return optimalIPLhelper(N - 1, 1, 2, 0);
     }
 
     /** Returns the average depth for nodes in an optimal BST of
@@ -27,6 +36,13 @@ public class ExperimentHelper {
      * @return
      */
     public static double optimalAverageDepth(int N) {
-        return 0;
+
+        return (double) optimalIPL(N) / N;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 1; i < 9; i += 1) {
+            System.out.println(optimalAverageDepth(i));
+        }
     }
 }
