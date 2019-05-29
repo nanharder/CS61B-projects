@@ -1,8 +1,5 @@
 package hw3.hash;
 
-import com.sun.source.tree.BinaryTree;
-import edu.princeton.cs.algs4.BST;
-import edu.princeton.cs.algs4.BinarySearch;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -25,14 +22,10 @@ public class TestSimpleOomage {
 
     @Test
     public void testHashCodePerfect() {
-        /* TODO: Write a test that ensures the hashCode is perfect,
-          meaning no two SimpleOomages should EVER have the same
-          hashCode UNLESS they have the same red, blue, and green values!
-         */
         Set<Integer> sets = new HashSet<>();
-        for (int r = 0; r <=255; r += 5) {
-            for (int g = 0; g <=255; g += 5) {
-                for (int b = 0; b <= 255; b+= 5) {
+        for (int r = 0; r <= 255; r += 5) {
+            for (int g = 0; g <= 255; g += 5) {
+                for (int b = 0; b <= 255; b += 5) {
                     SimpleOomage test = new SimpleOomage(r, g, b);
                     assertFalse(sets.contains(test.hashCode()));
                     sets.add(test.hashCode());
@@ -62,8 +55,6 @@ public class TestSimpleOomage {
         assertTrue(hashSet.contains(ooA2));
     }
 
-
-    /* TODO: Uncomment this test after you finish haveNiceHashCodeSpread in OomageTestUtility */
     @Test
     public void testRandomOomagesHashCodeSpread() {
         List<Oomage> oomages = new ArrayList<>();
