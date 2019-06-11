@@ -84,12 +84,80 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        double lrlon = requestParams.get("lrlon");
+        double ullon = requestParams.get("ullon");
+        double lrlat = requestParams.get("lrlat");
+        double ullat = requestParams.get("ullat");
+        boolean query_success = querySuccess(ullon, ullat, lrlon, lrlat);
+        if (query_success) {
+            results.put("query_success", query_success);
+            double queryLonDPP = (lrlon - ullon) / requestParams.get("w");
+            int depth = calDepth(queryLonDPP);
+            results.put("depth", depth);
+            completeBox(results, ullon, ullat, lrlon, lrlat, depth);
+        } else {
+            results = queryFail();
+        }
         return results;
+    }
+
+    private int calDepth(double queryLonDPP) {
+        double LonDpp = (Constants.ROOT_LRLON - Constants.ROOT_ULLON) / Constants.TILE_SIZE;
+        int depth = 0;
+        while (LonDpp > queryLonDPP) {
+            if (depth >= 7) {
+                break;
+            }
+            LonDpp = LonDpp / 2.0;
+            depth += 1;
+        }
+        return depth;
+    }
+
+    private boolean querySuccess(double ullon, double ullat, double lrlon, double lrlat) {
+        if (ullon >= Constants.ROOT_LRLON || ullat <= Constants.ROOT_LRLAT ||
+                lrlon <= Constants.ROOT_ULLON || lrlat >= Constants.ROOT_ULLAT) {
+            return false;
+        } else if (ullon >= lrlon || ullat <= lrlat) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void completeBox(Map<String, Object> result, double ullon, double ullat, double lrlon, double lrlat, int depth) {
+
+        double lonSec = (Constants.ROOT_LRLON - Constants.ROOT_ULLON) / Math.pow(2, depth);
+        double latSec = (Constants.ROOT_ULLAT - Constants.ROOT_LRLAT) / Math.pow(2, depth);
+        int bound = (int) Math.pow(2, depth) - 1;
+        int xLeftCol = checkCol((ullon - Constants.ROOT_ULLON) / lonSec, bound);
+        int xRightCol = checkCol((lrlon - Constants.ROOT_ULLON) / lonSec, bound);
+        int yUpCol = checkCol((Constants.ROOT_ULLAT - ullat) / latSec, bound);
+        int yLowCol = checkCol((Constants.ROOT_ULLAT - lrlat) / latSec, bound);
+        result.put("raster_ul_lon", Constants.ROOT_ULLON + xLeftCol * lonSec);
+        result.put("raster_ul_lat", Constants.ROOT_ULLAT - yUpCol * latSec);
+        result.put("raster_lr_lon", Constants.ROOT_ULLON + (xRightCol + 1) * lonSec);
+        result.put("raster_lr_lat", Constants.ROOT_ULLAT - (yLowCol + 1) * latSec);
+        int width = xRightCol - xLeftCol + 1;
+        int height = yLowCol - yUpCol + 1;
+        String[][] strings = new String[height][width];
+        for (int i = yUpCol; i <= yLowCol; i += 1) {
+            for (int j = xLeftCol; j <= xRightCol; j += 1) {
+                strings[i - yUpCol][j - xLeftCol] = String.format("d%d_x%d_y%d.png",depth, j, i);
+            }
+        }
+        result.put("render_grid", strings);
+    }
+
+    private int checkCol(double rawCol, int bound) {
+        if (rawCol < 0) {
+            return 0;
+        } else if (rawCol > bound) {
+            return bound;
+        } else {
+            return (int) rawCol;
+        }
     }
 
     @Override

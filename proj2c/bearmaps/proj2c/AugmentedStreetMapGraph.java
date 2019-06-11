@@ -2,7 +2,9 @@ package bearmaps.proj2c;
 
 import bearmaps.hw4.streetmap.Node;
 import bearmaps.hw4.streetmap.StreetMapGraph;
+import bearmaps.proj2ab.KDTree;
 import bearmaps.proj2ab.Point;
+import edu.princeton.cs.algs4.TrieSET;
 
 import java.util.*;
 
@@ -14,11 +16,33 @@ import java.util.*;
  * @author Alan Yao, Josh Hug, ________
  */
 public class AugmentedStreetMapGraph extends StreetMapGraph {
+    private HashMap<Point, Long> pointsMap;
+    private KDTree pointsTree;
+    private TrieSET stringNames;
+    private HashMap<String, String> transName;
 
     public AugmentedStreetMapGraph(String dbPath) {
         super(dbPath);
         // You might find it helpful to uncomment the line below:
-        // List<Node> nodes = this.getNodes();
+        List<Node> nodes = this.getNodes();
+        List<Point> points = new ArrayList<>();
+        pointsMap = new HashMap<>();
+        stringNames = new TrieSET();
+        transName = new HashMap<>();
+        for (Node node: nodes) {
+            String n = node.name();
+            if (n != null) {
+                stringNames.add(cleanString(n));
+                transName.put(cleanString(n), n);
+            }
+            if (neighbors(node.id()).isEmpty()) {
+                continue;
+            }
+            Point p = new Point(node.lon(), node.lat());
+            points.add(p);
+            pointsMap.put(p, node.id());
+        }
+        pointsTree = new KDTree(points);
     }
 
 
@@ -30,7 +54,8 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * @return The id of the node in the graph closest to the target.
      */
     public long closest(double lon, double lat) {
-        return 0;
+        Point p = pointsTree.nearest(lon, lat);
+        return pointsMap.get(p);
     }
 
 
@@ -43,7 +68,12 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * cleaned <code>prefix</code>.
      */
     public List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+        List<String> results = new LinkedList<>();
+        String cleanPrefix = cleanString(prefix);
+        for (String item : stringNames.keysWithPrefix(cleanPrefix)) {
+            results.add(transName.get(item));
+        }
+        return results;
     }
 
     /**
