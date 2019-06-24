@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.List;
 
 public class Engine {
-    /* Feel free to change the width and height. */
+    /* fixed parameters for the settings of game */
     private static final int TILE_SIZE = 16;
     private static final int WIDTH = 31;
     private static final int HEIGHT = 31;
@@ -21,6 +21,7 @@ public class Engine {
     private Direction direction = new Direction();
     private TERenderer ter;
 
+    /* helpful variable to build map */
     private Random rd;
     private List<Room> rooms;
     private HashMap<Position, Integer> regions;
@@ -36,11 +37,17 @@ public class Engine {
     private boolean isplaying;
     private boolean iswin;
 
+    /**
+     * the constructor of class of engine
+     */
     public Engine() {
         ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT + YOFFSET, 0, YOFFSET);
     }
 
+    /**
+     * initialize the engine, used when begin a new map
+     */
     public void initialize(){
         rd = new Random();
         rooms = new ArrayList<>();
@@ -53,6 +60,14 @@ public class Engine {
     }
 
 
+
+    /**
+     * useful class to build the world
+     */
+
+    /**
+     * class represents the room in the map
+     */
     private class Room {
         private int xp;
         private int yp;
@@ -72,6 +87,9 @@ public class Engine {
         }
     }
 
+    /**
+     * class represents the position as (x, y)
+     */
     private class Position {
         private int xp;
         private int yp;
@@ -112,6 +130,9 @@ public class Engine {
         }
     }
 
+    /**
+     * class to present directions with positions
+     */
     private class Direction {
         private final Position UP = new Position(0, 1);
         private final Position DOWN = new Position(0, -1);
@@ -125,6 +146,8 @@ public class Engine {
         private Position[] fullCardinals = {UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT};
 
     }
+
+
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -209,17 +232,16 @@ public class Engine {
         return world;
     }
 
+
+
+
     /**
-     * The task should be broke into small pieces.
-     * 1.Create a blank world;
-     * 2.add random room in the world, if overlaped, try again until the boundry;
-     * 3.add tileset on the world.
-     *
+     * Phase1:built map based the seed.
      * @source http://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/
      */
     public void buildMap(int seed) {
         //set the random seed
-        setSeed(seed);
+        rd.setSeed(seed);
 
         // initialize tiles
         for (int x = 0; x < WIDTH; x += 1) {
@@ -229,33 +251,159 @@ public class Engine {
             }
         }
 
-        //add random rooms
+        //add random rooms 500 times
         for (int i = 0; i < 500; i += 1) {
-            addRandomroom();
-        }
+            //To get random width and height of room
+            int size = RandomUtils.uniform(rd, 1, 2) * 2 + 1;
+            int rectangular = RandomUtils.uniform(rd, 0, size / 2 + 1) * 2;
+            int width = size;
+            int height = size;
+            if (RandomUtils.bernoulli(rd)) {
+                width += rectangular;
+            } else {
+                height += rectangular;
+            }
 
+            //To get the random position of room
+            int xPosition = RandomUtils.uniform(rd, 0, (WIDTH - width) / 2) * 2 + 1;
+            int yPosition = RandomUtils.uniform(rd, 0, (HEIGHT - height) / 2) * 2 + 1;
+
+            //check if the room isoverlap
+            Room room = new Room(xPosition, yPosition, width, height);
+            boolean isoverlap = false;
+            for (Room r : rooms) {
+                if (room.isOverlap(r)) {
+                    isoverlap = true;
+                    break;
+                }
+            }
+            if (isoverlap) {
+                continue;
+            }
+
+            //carve the valid room
+            rooms.add(room);
+            startRegion();
+            for (int x = room.xp; x < room.xp + width; x += 1) {
+                for (int y = room.yp; y < room.yp + height; y += 1) {
+                    Position pos = new Position(x, y);
+                    carve(pos);
+                }
+            }
+        }
 
         //add maze
         for (int y = 1; y < HEIGHT; y += 2) {
             for (int x = 1; x < WIDTH; x += 2) {
-                if (isOpen(x, y)) {
+                if ((isWall(x - 1, y) &&
+                        isWall(x + 1, y) &&
+                        isWall(x, y - 1) &&
+                        isWall(x, y + 1))) {
                     Position start = new Position(x, y);
                     growMaze(start);
                 }
             }
         }
+
         //connect the regions
         connectRegions();
         //remove the deadends
-        removeDeadends();
+        boolean done = false;
+        while (!done) {
+            done = true;
+            for (int i = 1; i < WIDTH; i += 1) {
+                for (int j =1; j < HEIGHT; j += 1) {
+                    Position pos = new Position(i, j);
+                    if (isWall(pos)) {
+                        continue;
+                    }
+                    int exit = 0;
+                    for (Position dir : direction.cardinal) {
+                        if (!isWall(pos.plus(dir))) {
+                            exit += 1;
+                        }
+                    }
+                    if (exit > 1) {
+                        continue;
+                    }
+                    setTile(pos, Tileset.WALL);
+                    done = false;
+                    carvedPoints.remove(pos);
+                }
+            }
+        }
         //remove unnecessary wall
-        removeExcessWall();
+        done = false;
+        while (!done) {
+            done = true;
+
+            for (int i = 0; i < WIDTH; i += 1) {
+                for (int j = 0; j < HEIGHT; j += 1) {
+                    Position pos = new Position(i, j);
+                    if (!isWall(pos)) {
+                        continue;
+                    }
+                    int wallCount = 0;
+                    for (Position dir : direction.fullCardinals) {
+                        if (isWall(pos.plus(dir)) || isNothing(pos.plus(dir))) {
+                            wallCount += 1;
+                        }
+                    }
+                    if (wallCount < 8) {
+                        continue;
+                    }
+                    setTile(pos, Tileset.NOTHING);
+                    done = false;
+                }
+            }
+        }
+
         //carve the door
-        carveDoor();
+        ArrayList<Position> doors = new ArrayList<>();
+        for (int i = 1; i < WIDTH; i+= 1) {
+            for (int j = 1; j <HEIGHT; j+= 1) {
+                Position pos = new Position(i, j);
+                if (!isWall(pos)) {
+                    continue;
+                }
+                int exit = 0;
+                int wall = 0;
+                int nothing = 0;
+                for (Position dir: direction.fullCardinals) {
+                    Position unchecked = pos.plus(dir);
+                    if (isWall(unchecked)) {
+                        wall += 1;
+                    } else if (isNothing(unchecked)) {
+                        nothing += 1;
+                    } else {
+                        exit += 1;
+                    }
+                    if (exit == 3 && wall == 2 && nothing == 3) {
+                        doors.add(pos);
+                    }
+                }
+            }
+        }
+        door = doors.get(RandomUtils.uniform(rd, 0,doors.size()));
+        setTile(door, Tileset.LOCKED_DOOR);
+
         //set the avater
-        setAvater();
+        int maxDistance = 0;
+        avater = door;
+        for (Position pos : carvedPoints) {
+            int dis = pos.distance(door);
+            if (dis > maxDistance) {
+                avater = pos;
+                maxDistance = dis;
+            }
+        }
+        setTile(avater, Tileset.AVATAR);
+
         //build the dark world
-        lightDarkWorld();
+        copyTileToDark(avater);
+        for (Position dir : direction.fullCardinals) {
+            copyTileToDark(avater.plus(dir));
+        }
         copyTileToDark(door);
     }
 
@@ -269,36 +417,36 @@ public class Engine {
         drawHud();
     }
 
+
     /**
-     * helpful utils to built map.
+     * useful utils in phase1
      */
-    private void lightDarkWorld() {
-        copyTileToDark(avater);
-        for (Position dir : direction.fullCardinals) {
-            copyTileToDark(avater.plus(dir));
-        }
-    }
 
-    private void clearDarkWorld() {
-        setTileInDark(avater);
-        for (Position dir : direction.fullCardinals) {
-            setTileInDark(avater.plus(dir));
-        }
-    }
-
+    /**
+     * set the tile in darkworld is same as world
+     */
     private void copyTileToDark(Position pos) {
         darkworld[pos.xp][pos.yp] = world[pos.xp][pos.yp];
     }
 
+    /**
+     * add the index of region
+     */
     private void startRegion() {
         currentRegion += 1;
     }
 
+    /**
+     * check if the postion is in the map
+     */
     private boolean isValidatePos(Position p) {
         return (!(p.xp < 0 || p.xp >= WIDTH || p.yp < 0 || p.yp >= HEIGHT));
 
     }
 
+    /**
+     * check if the position is nothing or out of the map
+     */
     private boolean isNothing(Position p) {
         if (!isValidatePos(p)) {
             return true;
@@ -306,6 +454,9 @@ public class Engine {
         return (world[p.xp][p.yp] == Tileset.NOTHING);
     }
 
+    /**
+     * check if the position is the tile
+     */
     private boolean checkTile(Position pos, TETile tile) {
         if (!isValidatePos(pos)) {
             return false;
@@ -313,11 +464,11 @@ public class Engine {
         return (world[pos.xp][pos.yp] == tile);
     }
 
+    /**
+     * check if the tile is wall
+     */
     private boolean isWall(Position pos) {
-        if (!isValidatePos(pos)) {
-            return false;
-        }
-        return (world[pos.xp][pos.yp] == Tileset.WALL);
+        return checkTile(pos, Tileset.WALL);
     }
 
     private boolean isWall(int x, int y) {
@@ -325,21 +476,23 @@ public class Engine {
         return isWall(pos);
     }
 
-    private boolean isOpen(int x, int y) {
-        return (isWall(x - 1, y) &&
-                isWall(x + 1, y) &&
-                isWall(x, y - 1) &&
-                isWall(x, y + 1));
-    }
-
+    /**
+     * set the position as the tile
+     */
     private void setTile(Position pos, TETile tile) {
         world[pos.xp][pos.yp] = tile;
     }
 
+    /**
+     * set the position in the darkworld as the tile
+     */
     private void setTileInDark(Position pos) {
         darkworld[pos.xp][pos.yp] = Tileset.NOTHING;
     }
 
+    /**
+     * carve the position as floor
+     */
     private void carve(Position pos) {
         if (isValidatePos(pos)) {
             setTile(pos, Tileset.FLOOR);
@@ -348,6 +501,9 @@ public class Engine {
         }
     }
 
+    /**
+     *check if the direction of postion could be carved
+     */
     private boolean canCarve(Position pos, Position dir) {
         Position target = pos.plus(dir);
         Position start = pos.subtract(target);
@@ -366,62 +522,25 @@ public class Engine {
         return true;
     }
 
-    private void addJunction(Position p) {
-        setTile(p, Tileset.FLOOR);
-        carvedPoints.add(p);
-    }
-
-    private void setSeed(int seed) {
-        rd.setSeed(seed);
-    }
-
     /**
-     * Phase1: main methods to build maps.
-     */
-
-    private void addRandomroom() {
-        //To get random width and height of room
-        int size = RandomUtils.uniform(rd, 1, 2) * 2 + 1;
-        int rectangular = RandomUtils.uniform(rd, 0, size / 2 + 1) * 2;
-        int width = size;
-        int height = size;
-        if (RandomUtils.bernoulli(rd)) {
-            width += rectangular;
-        } else {
-            height += rectangular;
-        }
-        int xPosition = RandomUtils.uniform(rd, 0, (WIDTH - width) / 2) * 2 + 1;
-        int yPosition = RandomUtils.uniform(rd, 0, (HEIGHT - height) / 2) * 2 + 1;
-        Room room = new Room(xPosition, yPosition, width, height);
-        for (Room r : rooms) {
-            if (room.isOverlap(r)) {
-                return;
-            }
-        }
-        rooms.add(room);
-        startRegion();
-        for (int i = room.xp; i < room.xp + width; i += 1) {
-            for (int j = room.yp; j < room.yp + height; j += 1) {
-                Position pos = new Position(i, j);
-                carve(pos);
-            }
-        }
-    }
-
-    /**
-     * glow tree algorithms
+     * glow tree algorithms to grow maze.
      */
     private void growMaze(Position start) {
+    //create new
         LinkedList<Position> cells = new LinkedList<>();
         Position lastDir = null;
 
+        //add a new maze
         startRegion();
         carve(start);
+
+        //add the start position to the cell
         cells.add(start);
         while (!cells.isEmpty()) {
             Position cell = cells.getLast();
             ArrayList<Position> unmadeCells = new ArrayList<>();
 
+            //add potential cancarved tile to unmadecells
             for (Position dir : direction.cardinal) {
                 if (canCarve(cell, dir)) {
                     unmadeCells.add(dir);
@@ -486,8 +605,6 @@ public class Engine {
             }
         }
 
-
-
         int[] merged = new int[currentRegion + 1];
         Set<Integer> openRegions = new HashSet<>();
         for (int i = 0; i <= currentRegion; i += 1) {
@@ -498,7 +615,8 @@ public class Engine {
         while (openRegions.size() > 1) {
             Position connector = connectors.get(RandomUtils.uniform(rd, connectors.size()));
 
-            addJunction(connector);
+            setTile(connector, Tileset.FLOOR);
+            carvedPoints.add(connector);
 
             ArrayList<Integer> connectedRegions = new ArrayList<>();
             for (int i : connections.get(connector)) {
@@ -528,7 +646,8 @@ public class Engine {
                 }
 
                 if (RandomUtils.uniform(rd, 100) > 95) {
-                    addJunction(pos);
+                    setTile(pos, Tileset.FLOOR);
+                    carvedPoints.add(pos);
                 }
 
                 return true;
@@ -537,139 +656,10 @@ public class Engine {
         }
     }
 
-    private void removeDeadends() {
-        boolean done = false;
-        ArrayList<Position> deadends = new ArrayList<>();
-        while (!done) {
-            done = true;
 
-            for (Position pos : carvedPoints) {
-                if (isWall(pos)) {
-                    continue;
-                }
-                int exit = 0;
-                for (Position dir : direction.cardinal) {
-                    if (!isWall(pos.plus(dir))) {
-                        exit += 1;
-                    }
-                }
-                if (exit > 1) {
-                    continue;
-                }
-                setTile(pos, Tileset.WALL);
-                deadends.add(pos);
-                done = false;
-            }
-            carvedPoints.remove(deadends);
-            deadends.clear();
-        }
-    }
-
-    private void removeExcessWall() {
-        boolean done = false;
-        while (!done) {
-            done = true;
-
-            for (int i = 0; i < WIDTH; i += 1) {
-                for (int j = 0; j < HEIGHT; j += 1) {
-                    Position pos = new Position(i, j);
-                    if (!isWall(pos)) {
-                        continue;
-                    }
-                    int wallCount = 0;
-                    for (Position dir : direction.fullCardinals) {
-                        if (isWall(pos.plus(dir)) || isNothing(pos.plus(dir))) {
-                            wallCount += 1;
-                        }
-                    }
-                    if (wallCount < 8) {
-                        continue;
-                    }
-                    setTile(pos, Tileset.NOTHING);
-                    done = false;
-                }
-            }
-        }
-    }
-
-    private void carveDoor() {
-        ArrayList<Position> doors = new ArrayList<>();
-        for (int i = 1; i < WIDTH; i+= 1) {
-            for (int j = 1; j <HEIGHT; j+= 1) {
-                Position pos = new Position(i, j);
-                if (!isWall(pos)) {
-                    continue;
-                }
-                int exit = 0;
-                int wall = 0;
-                int nothing = 0;
-                for (Position dir: direction.fullCardinals) {
-                    Position unchecked = pos.plus(dir);
-                    if (isWall(unchecked)) {
-                        wall += 1;
-                    } else if (isNothing(unchecked)) {
-                        nothing += 1;
-                    } else {
-                        exit += 1;
-                    }
-                    if (exit == 3 && wall == 2 && nothing == 3) {
-                        doors.add(pos);
-                    }
-                }
-            }
-        }
-        door = doors.get(RandomUtils.uniform(rd, 0,doors.size()));
-        setTile(door, Tileset.LOCKED_DOOR);
-    }
-
-    /**
-     * set the start position of character, it should be the farthest from the end.
-     */
-    private void setAvater() {
-        int maxDistance = 0;
-        avater = door;
-        for (Position pos : carvedPoints) {
-            int dis = pos.distance(door);
-            if (dis > maxDistance) {
-                avater = pos;
-                maxDistance = dis;
-            }
-        }
-        setTile(avater, Tileset.AVATAR);
-    }
 
     /**
      *Phase2: build the UI for users.
-     */
-
-    /**
-     * some utils for phase 2;
-     */
-
-    private void drawTitle() {
-        StdDraw.clear(Color.black);
-        Font title = new Font("Monaco", Font.BOLD, TILE_SIZE * 2);
-        StdDraw.setFont(title);
-        StdDraw.setPenColor(Color.white);
-        StdDraw.text(WIDTH / 2,HEIGHT / 4 * 3, "CS61B: Dungeon Game");
-    }
-
-    private void setStd() {
-        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE);
-        StdDraw.setFont(font);
-        StdDraw.setPenColor(Color.WHITE);
-    }
-
-    private void clearBottom() {
-        StdDraw.setPenColor(Color.BLACK);
-        StdDraw.filledRectangle(WIDTH / 2, 0.5, WIDTH / 2, 0.5);
-        StdDraw.setPenColor(Color.WHITE);
-
-    }
-
-
-    /**
-     * main construct method for phase 2;
      */
 
     private void drawSeedInterface() {
@@ -748,22 +738,6 @@ public class Engine {
         }
     }
 
-    private void move(Position pos) {
-        if (checkTile(pos, Tileset.FLOOR)) {
-            clearDarkWorld();
-            setTile(avater, Tileset.FLOOR);
-            setTile(pos, Tileset.AVATAR);
-            avater = pos;
-            lightDarkWorld();
-        } else if (checkTile(pos, Tileset.LOCKED_DOOR)) {
-            setTile(avater, Tileset.FLOOR);
-            setTile(pos, Tileset.AVATAR);
-            iswin = true;
-            drawInitialInterface();
-        }
-    }
-
-
     private void actionHandler(char action) {
         actions.append(action);
         if (action >= 'A' && action <= 'Z') {
@@ -807,7 +781,7 @@ public class Engine {
                         showMap();
                     } else {
                         StdDraw.text(WIDTH / 2, HEIGHT / 4,
-                                "Sorry, you don't have ant save now.");
+                                "Sorry, you don't have any save now.");
                     }
                     break;
                 case ('q') :
@@ -815,6 +789,37 @@ public class Engine {
             }
         }
     }
+
+    private void move(Position pos) {
+        if (checkTile(pos, Tileset.FLOOR)) {
+            //set old world to dark
+            setTileInDark(avater);
+            for (Position dir : direction.fullCardinals) {
+                setTileInDark(avater.plus(dir));
+            }
+
+            // change the tile
+            setTile(avater, Tileset.FLOOR);
+            setTile(pos, Tileset.AVATAR);
+            avater = pos;
+
+            // light new avater and neighbors
+            copyTileToDark(avater);
+            for (Position dir : direction.fullCardinals) {
+                copyTileToDark(avater.plus(dir));
+            }
+        } else if (checkTile(pos, Tileset.LOCKED_DOOR)) {
+            setTile(avater, Tileset.FLOOR);
+            setTile(pos, Tileset.AVATAR);
+            iswin = true;
+            drawInitialInterface();
+        }
+    }
+
+
+    /**
+     *useful utils in phase2
+     */
 
     private int getSeed() {
         int midWidth = WIDTH / 2;
@@ -887,9 +892,26 @@ public class Engine {
         return "";
     }
 
-    public static void main(String args[]) {
-        Engine eg = new Engine();
-        eg.interactWithKeyboard();
+    private void drawTitle() {
+        StdDraw.clear(Color.black);
+        Font title = new Font("Monaco", Font.BOLD, TILE_SIZE * 2);
+        StdDraw.setFont(title);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(WIDTH / 2,HEIGHT / 4 * 3, "CS61B: Dungeon Game");
     }
+
+    private void setStd() {
+        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE);
+        StdDraw.setFont(font);
+        StdDraw.setPenColor(Color.WHITE);
+    }
+
+    private void clearBottom() {
+        StdDraw.setPenColor(Color.BLACK);
+        StdDraw.filledRectangle(WIDTH / 2, 0.5, WIDTH / 2, 0.5);
+        StdDraw.setPenColor(Color.WHITE);
+
+    }
+
 }
 
